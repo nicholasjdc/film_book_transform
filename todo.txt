@@ -1,0 +1,180 @@
+Final to-dos:
+    - delete duplicate entries
+    - Manually upload final entry
+    - Ask dad about how to number new combined entries
+    - Also ask dad about weird duplicate entries (1661 or 1691 i think?)
+    - maybe expand if fun
+
+
+
+
+
+
+
+x    0130 -- weird publication
+x 0515 -- author is only a single word, no comma,
+x 0529 -- author two words, no comma, 
+x 0532-0537 ----Page number before publication error
+x 0538 fucky author stuff
+X 0541 ---Translation for title missing =
+X 0661 -- page number before publication
+x 0691 --- Second author listed has parentheses, messing up detect message
+x 0692 --- author single word
+x 0736 --- page Count, p lacking "." [fixed in text]
+x 746 --- Author single word
+x 747 --- Author single word
+x 782 ---Author no comma, just parentheses
+x 834 ---For Page Count, "No pagination" written
+x 886 ---Author very long, no commas, except at end w/ 1999 -
+x 904 --- publication before page number, page count consumed publication
+x 915 --- No pagination written for page count
+ 991 --- chinese following series title, bugged out
+x 1146 --- Author one word
+x 1249 ---Author not regex: Li，Yuxuan （Lee, Yu-shiuan）.
+x 1372 --- Author not regex (same author as 1249)
+ 1390 --- Publication mistaken for page count
+ 1661 ---Goofy author placement
+ 1691
+ 1692
+ 1763
+ 1789 ----NEED FIX
+ 1797
+ 1823
+
+ 1941 -- Deleted Parentheses
+ 1974
+ 2014
+ 2033
+ 2087 --author regex long
+ 2088
+ 2127
+ 2135 a chill
+ 2153
+ 2190 a chill
+ 2208
+ 2209
+ 2225 --- Stle????? a
+ 2345 a chill
+ 2409 --- STyle??? a
+ 2419 ---Pain in the ass style like above
+ Main issues:
+ - Author can be single word, or "[word] , [word] ..."
+- single word author
+- author no comma
+- author too long
+- page count, no pagination
+- Page number being caught in publication
+- page number before publication, consuming publication
+
+JSON issue:
+- need to add a comma between entries
+- would like to title the entries w/ the entrynumber
+Code implementation:
+    - Consistent elements: 
+    (Entry Number -- always a 4 digit number) 
+    [Variable containing author, title] 
+    (publication -- Has two words[sometimes with comma after first word], then colon) 
+    (page/volume numbers -- ends w/ p. or v.)
+    (ISBN -- always starts with "ISBN")
+    (Note -- can be mulitple lines)
+    (Language Codes -- Chi, Eng, WorldCat, etc. If next line is blank, then we are at language codes)
+
+    - Meta elements:
+    First entry is always entry number
+    [Author ?]
+        -- If entry is "word, word" or the entry is under 3 words, the entry is author
+        -- else if the entry is the title
+        -- the following line can also be the author in chinese 
+    [Title]
+        -- Separate by slash
+            - words after the slash are the authors
+        -- separate by equals sign 
+            - Each side of the equals sign are the title in different languages (detect language)
+        -- the following line can also be the title in chinese
+    Title
+    publication begins with 1-2 words then a colon
+    End entry with empty line
+
+
+
+1. (ex: 0001)
+    Entry Number
+    (Pinyin title) "/" (pinyin authors, demarcated with commas)
+    (Chinese title) "/" (chinese authors, demarcated with commas)
+    (Publication location ":" publication) "," year
+    volume count "v."
+    "ISBN" (ISBN Number)
+    Note
+    Language Codes (Spaced out)
+2. (ex: 0002)
+    (Entry Number)
+    (Last name English)"," (First name English)
+    (English title) "=" (Chinese Title)
+    (Publication Location)":" (Publication Name)"," (publication year)
+    (# of pages) "p."
+    "ISBN" (ISBN Number)
+    "Note: " (Note Content)
+    Language Codes [Contiguous w/ capitalisation]
+3. (ex: 0003)
+    (Entry Number)
+    (Pinyin title) "=" (English title) "/" (Pinyin[maybe no english name?] authors demarcated by ",")
+    (Chinese title) "=" (English Title) "/" (Chinese author)
+    (Publication Location [pinyin])":" (Publication name [pinyin])"," (publication year)
+    (# volumes) "v." "(" (# pages) "p." ")"
+    "ISBN" (ISBN #) "(pbk.);" (ISBN # 2) "(pbk.);"
+    "Note:" (Notes Content)
+    Language codes
+4. (ex: 0004)
+    (English Last name)"," (English First name)"," (Birth year)"-"
+    (Chinese Name)"," (Birth year)"-"
+    (English title) "=" (Chinese title)
+    (Publication location)":" (Publication name)"," (Publication year)
+    (# pages) "p."
+    "Series title: " (Series title)
+    (Series title Chinese)
+    "Note: " (Note content)
+    Language Codes
+5. (ex: 0005)
+    (Entry Number)
+    (Pinyin title ) "=" (English title) "/" (Author [pinyin, english])
+    (Chinese Title) "=" (English title)
+     (Publication Location [pinyin])":" (Publication name [pinyin])"," (publication year)
+    (#pages) "p."
+    "ISBN" (ISBN #)
+    "Note:" (Notes Content)
+    Language codes
+6. (ex: 0006)
+    (Entry Number)
+    (Pinyin title) "/" (Author [pinyin])
+    (Chinese Title) "/" (Author [Chinese])
+    (Publication Location [pinyin])":" (Publication name [pinyin])"," (publication year)
+    (#pages) "p."
+    "ISBN" (ISBN #)
+    "Note:" (Notes Content)
+    Language codes
+7. (ex: 0007) SAME AS #6
+    (Entry Number)
+    (Pinyin title) "/" (Author [pinyin])
+    (Chinese Title) "/" (Author [Chinese])
+    (Publication Location [pinyin])":" (Publication name [pinyin])"," (publication year)
+    (#pages) "p."
+    "ISBN" (ISBN #)
+    "Note:" (Notes Content)
+    Language codes
+
+8.
+    (Entry Number)
+    (English title) "/" "Edited by:" (Author list)
+    (Publication Location )":" (Publication name [pinyin])"," (publication year)
+    (#pages) "p."
+    "ISBN" (ISBN #)
+    "Note:" (Notes Content)
+    Language codes
+9. (ex: 0170) ---WEIRD university thesis paper
+    (Entry number)
+    (Author last name [pinyin]) "," (Author First name (pinyin)) "("(Author Alternative Spelling)")"
+    (Author Chinese)
+    (Title Pinyin)
+    (Title Chinese)
+
+Manual Entry: 1615
