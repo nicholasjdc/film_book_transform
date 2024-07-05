@@ -20,6 +20,7 @@ class BookEntry:
     subjects: list[str] = field(default_factory=list)
     seriesTitle: str = ""
     seriesTitlec: str = ""
+    prevEntryNumbers: list[str] = field(default_factory=list)
     missingFields: list[str] = field(default_factory=list)
     
     def toDict(self):

@@ -1,0 +1,8 @@
+{
+  "type": "module",
+  "dependencies": {
+    "auto-i18n": "^1.0.0",
+    "dotenv": "^16.4.5",
+    "mkdirp": "^3.0.1"
+  }
+}

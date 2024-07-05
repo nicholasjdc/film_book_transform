@@ -4,16 +4,24 @@ import re
 import json
 LOG_STATUS = 1
 LOG_LEVEL = 10
-def checkDupField(targetvalue: str, field: str) -> list[str]:
+def checkDupField(targetvalue: str, field: str):
     duplicateSubjectsSet = set()
+    previousEntryNumbersSet = set()
     for be in finalData:
         tempdata = be
         if tempdata[field] == targetvalue:
             
             addSubjectList: list[str] = tempdata['subjects']
+            previousEntryNumbers: list[str] = tempdata['prevEntryNumbers']
+            for en in previousEntryNumbers:
+                previousEntryNumbersSet.add(en)
+            previousEntryNumbersSet.add(tempdata['entryNumber'])
             for subject in addSubjectList:
                 duplicateSubjectsSet.add(subject)
-    return duplicateSubjectsSet
+            
+            finalData.remove(be)
+            break
+    return [duplicateSubjectsSet, previousEntryNumbersSet]
 def notSillyDetect(msg: str):
     lc = "zh-cn"
     try:
@@ -71,6 +79,7 @@ publicationRegex = re.compile(r".+\:.+\,.*")
 
 finalDictionary = {'entries': []}
 finalData = []
+subjectList = set()
 with open('data.json', 'w', encoding='utf-8') as f:
     pass
 while True:
@@ -95,6 +104,7 @@ while True:
 
     if subjectsRegex.match(strippedLine):
         subject = " ".join(strippedLine.split()[1:])
+        subjectList.add(subject)
     
     if strippedLine.isdigit():
         if 'nBE' in globals():
@@ -115,16 +125,21 @@ while True:
             nBE.assignMissingFields()
             if nBE.ISBN != '':
                 additionalSubjects = checkDupField(nBE.ISBN, 'ISBN')
-                nBE.subjects += additionalSubjects
+                nBE.subjects += additionalSubjects[0]
+                nBE.prevEntryNumbers +=additionalSubjects[1]
             elif nBE.title != '':
                 additionalSubjects = checkDupField(nBE.title, 'title')
-                nBE.subjects += additionalSubjects
+                nBE.subjects += additionalSubjects[0]
+                nBE.prevEntryNumbers +=additionalSubjects[1]
             elif nBE.titlep != '':
                 additionalSubjects = checkDupField(nBE.titlep, 'titlep')
-                nBE.subjects += additionalSubjects
+                nBE.subjects += additionalSubjects[0]
+                nBE.prevEntryNumbers +=additionalSubjects[1]
             elif nBE.titlec != '':
                 additionalSubjects = checkDupField(nBE.titlec, 'titlec')
-                nBE.subjects += additionalSubjects
+                nBE.subjects += additionalSubjects[0]
+                nBE.prevEntryNumbers +=additionalSubjects[1]
+
             else: 
                 pass
             with open('data.json', 'a', encoding='utf-8') as f:
@@ -143,7 +158,7 @@ while True:
             logprint(nBE, LOG_STATUS)
             awaitingEntryNumber = False
     elif awaitingAuthor:
-        if authorRegex.match(strippedLine) or authorRegexParen.match(strippedLine) or len(splitLine) < 3:#len(splitLine) <= 3 and strippedLine != ' ':
+        if not '/' in strippedLine and (authorRegex.match(strippedLine) or authorRegexParen.match(strippedLine) or len(splitLine) < 3):#len(splitLine) <= 3 and strippedLine != ' ':
             logprint("author verified", LOG_STATUS)
             lc = notSillyDetect(strippedLine)
             logprint(lc, LOG_STATUS)
@@ -319,6 +334,7 @@ logprint('Assigning data to dictionary', 100)
 finalDictionary['entries'] = finalData
 
 logprint('Opening file and dumping data', 100)
+logprint(subjectList, 100)
 with open('data_test.json', 'w', encoding='utf-8') as file2:
     json.dump(finalDictionary, file2, ensure_ascii=False, indent=4)
 file1.close()
