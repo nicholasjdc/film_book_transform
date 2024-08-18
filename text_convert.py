@@ -50,7 +50,7 @@ def setAwaitingStatusBulk(status):
     awaitingSeriesTitle = status
     awaitingSeriesTitlec = status
     
-FULL_MANUSCRIPT = 'film_taiwan_manuscript.txt'
+FULL_MANUSCRIPT = 'film_china_1section.txt'
 TEST_MANUSCRIPT = 'test_manuscript.txt'
 file1 = open(FULL_MANUSCRIPT, 'r')
 
